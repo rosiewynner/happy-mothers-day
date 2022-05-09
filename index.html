@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    background: url("downstairs.svg") no-repeat ;
+}
+</style>
+<div style="display:none;">
+    <img id="source"
+         src="mom.svg"
+        >
+  </div>
+  <div style="display:none;">
+    <img id="dad"
+         src="dad.svg"
+        >
+  </div>
+  <div style="display:none;">
+    <img id="tris"
+         src="tris.svg"
+        >
+  </div>
+  <div style="display:none;">
+    <img id="rosie"
+         src="rosie.svg"
+        >
+  </div>
+  <div style="display:none;">
+    <img id="cake"
+         src="cake.svg"
+        >
+  </div>
+</head>
+<body onload="startGame()">
+<script>
+
+var canvasWidth = 1350+200;
+var canvasHeight = 800;
+
+var mom;
+
+var interval = setInterval(updateCanvas, 10);
+
+var isMovingLeft = false;
+var isMovingUp = false;
+var isMovingDown = false;
+var isMovingRight = false;
+var speed = 3;
+
+message = "Use the arrow keys to head to the dining room";
+
+function startGame() {
+    gameCanvas.start();
+    mom = new createPerson(40, 40, 'source');   
+    dad = new createPerson(1106.65-35, 719.9, 'dad');   
+    tris = new createPerson(1116-45, 517-90, 'tris');   
+    rosie = new createPerson(1218, 628-55, 'rosie');   
+    cake = new createPerson(1096.5-35, 608.36-35, 'cake');  
+    messageLabel = new createScoreLabel(800, 200);
+}
+
+var gameCanvas = {
+    canvas: document.createElement("canvas"),
+
+    start: function() {
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+    }
+}
+
+function createPerson(x, y) {
+    this.x = x;
+    this.y = y;
+    
+    this.draw = function(id) {
+        ctx = gameCanvas.context;
+        const image = document.getElementById(id);
+        ctx.drawImage(image, this.x, this.y, 90, 90)
+    }
+
+
+    this.stopPlayer = function() {
+        var leftBound = 0;
+        var upBound = 0;
+        var upperRightBound = 194-90;
+        var upperBound = 477;
+        var lowerBound = 750-90;
+        if (this.y < upBound) {
+            isMovingUp = false;
+        }
+        if (this.y > lowerBound) {
+            isMovingDown = false;
+        }
+        if (this.x < leftBound) {
+            isMovingLeft = false;
+        }
+        if (this.y < upperBound && this.x > upperRightBound) {
+            isMovingUp = false;
+            isMovingRight = false;
+        }
+        if (this.y > 700-90 && this.x > 590) {
+            isMovingDown = false;
+            isMovingRight = false;
+        }
+        if ( this.x > 1350-90) {
+            isMovingRight = false;
+        }
+       
+    }
+
+    this.go = function() {
+        if (isMovingDown) {
+            this.y += speed;
+        }
+        if (isMovingUp) {
+            this.y -= speed;
+        }
+        if (isMovingLeft) {
+            this.x -= speed;
+        }
+        if (isMovingRight) {
+            this.x += speed;
+        }
+    }
+
+    this.win = function() {
+       if (this.x > 690) {
+        isMovingRight = false;
+        dad.draw('dad');
+        tris.draw('tris');
+        rosie.draw('rosie');
+        cake.draw('cake');
+        message = 'HAPPY MOTHERS DAY!'
+       }
+    }
+}
+
+function createScoreLabel(x, y) {
+    this.x = x;
+    this.y = y;
+    this.draw = function() {
+        ctx = gameCanvas.context;
+        ctx.font = "25px Marker Felt";
+        ctx.fillStyle = "black";
+        ctx.fillText(this.text, this.x, this.y);
+    }
+}
+
+function updateCanvas() {
+    ctx = gameCanvas.context;
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    
+    mom.draw('source');
+    mom.go();
+    mom.stopPlayer();
+    mom.win();
+    messageLabel.text = message;
+    messageLabel.draw();
+}
+
+document.body.onkeyup = function(e) {
+    //right
+    if (e.keyCode == 39) {
+        isMovingLeft = false;
+        isMovingUp = false;
+        isMovingDown = false;
+        isMovingRight = true;
+    }
+    //down
+    if (e.keyCode == 40) {
+        isMovingLeft = false;
+        isMovingUp = false;
+        isMovingDown = true;
+        isMovingRight = false;
+    }
+    //left
+    if (e.keyCode == 37) {
+        isMovingLeft = true;
+        isMovingUp = false;
+        isMovingDown = false;
+        isMovingRight = false;
+    }
+    //up
+    if (e.keyCode == 38) {
+        isMovingLeft = false;
+        isMovingUp = true;
+        isMovingDown = false;
+        isMovingRight = false;
+    }
+}
+
+</script>
+<br>
+</body>
+</html>
